@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Image.h"
+#include "image.h"
 #include "Scene.h"
 #include "Sphere.h"
 using namespace std;
