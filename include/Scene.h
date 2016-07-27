@@ -2,7 +2,7 @@
 #define SCENE_H
 
 #include "Shape.h"
-#include "Image.h"
+#include "image.h"
 #include <vector>
 #include <limits>
 

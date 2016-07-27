@@ -1,4 +1,4 @@
-#include "Image.h"
+#include "image.h"
 using namespace std;
 using namespace Raytracer148;
 
