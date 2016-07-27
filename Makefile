@@ -14,7 +14,7 @@ default: $(OBJS)
 objs/main.o: src/main.cpp
 	$(CPP) -c $(CPPFLAGS) $(INCLUDE) src/main.cpp -o objs/main.o
 
-objs/image.o: src/Image.cpp include/Image.h
+objs/image.o: src/Image.cpp include/image.h
 	$(CPP) -c $(CPPFLAGS) $(INCLUDE) src/Image.cpp -o objs/image.o
 
 objs/shape.o: src/Shape.cpp include/Shape.h
