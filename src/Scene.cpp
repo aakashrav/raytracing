@@ -32,11 +32,16 @@ Vector3d Scene::trace(const Ray &ray, int curr_recursion_depth) {
     rec = closestHit(ray, foundSomething);
 
     Vector3d lightDir = (lightPos - rec.position).normalized();
-    if (rec.t < numeric_limits<double>::epsilon()) return result;
+    if (rec.t < numeric_limits<double>::epsilon()) {
+        return result;
+    }
 
+    // Compute the diffuse
     double diffuse = lightDir.dot(rec.normal);
     if (diffuse < 0) diffuse = 0;
 
+    // If the ray has intersected an object, we compute the 
+    // Phong shading model to display the color of the object
     if (foundSomething) {
         // Ambient color
         result = ambientLightColor * ambientLightStrength;
@@ -45,25 +50,30 @@ Vector3d Scene::trace(const Ray &ray, int curr_recursion_depth) {
         Ray lightRay;
         lightRay.origin = rec.position;
         lightRay.direction = lightDir;
-        // Check shading
+        // Additional phong shading
         HitRecord srec = closestHit(lightRay, foundSomething);
         if (!foundSomething) {
             Vector3d h = (lightDir.normalized() + (-ray.direction).normalized()).normalized();
             result += (((specularLightColor * diffuse) * max(0.0,(rec.normal.dot(lightDir)))) + 
-                     ((specularLightColor * specularLightStrength)*(pow((rec.normal.dot(h)),shininess))));
+                     ((specularLightColor * specularLightStrength)*(pow((rec.normal.dot(h)),rec.hitObjectShininess))));
         }
     }
 
+    // Obtain the reflection vector
     // http://math.stackexchange.com/questions/13261/how-to-get-a-reflection-vector
     Vector3d lightReflection = (ray.direction) - ((2 * ((ray.direction).dot(rec.normal))) * rec.normal);
     Ray newRay;
     newRay.origin = rec.position;
     newRay.direction = lightReflection;
 
+    // If we reach the maximum recursion depth, we just return
     if (curr_recursion_depth == max_recursion_depth)
         return result;
+    // Else we recursively call trace again to compute the final color
     else
         return (result + (specularLightStrength * trace(newRay,curr_recursion_depth+1)));
+
+    return result;
 }
 
 void Scene::render(Image &image) {
@@ -74,7 +84,7 @@ void Scene::render(Image &image) {
     assert(image.getWidth() == image.getHeight());
 
     // Sampling grid size
-    int n = 3;
+    int n = 1;
 
     int size = image.getWidth();
     double pixelSize = 2. / size;
@@ -85,11 +95,12 @@ void Scene::render(Image &image) {
             color[1] = 0;
             color[2] = 0;
 
+            // Regular sampling for antialiasing
             for (int p = 0; p < n; p++) {
                 for (int q = 0; q < n; q++) {
 
-                    double x_offset = (double)p/n;
-                    double y_offset = (double)q/n;
+                    double x_offset = ((double)p + 0.5)/n;
+                    double y_offset = ((double)q + 0.5)/n;
 
                     Ray curRay;
                     curRay.origin[0] = curRay.origin[1] = curRay.origin[2] = 0;
@@ -97,7 +108,6 @@ void Scene::render(Image &image) {
                     curRay.direction[1] = 1 - (y + y_offset) * pixelSize;
                     curRay.direction[2] = 1;
                     color += trace(curRay,0);
-                    std::cout << x_offset << " " << y_offset << std::endl;
                 }
             }
 
@@ -105,13 +115,6 @@ void Scene::render(Image &image) {
             color[1] /= (n*n);
             color[2] /= (n*n);
 
-            // Ray curRay;
-            // curRay.origin[0] = curRay.origin[1] = curRay.origin[2] = 0;
-            // curRay.direction[0] = (x + 0.5) * pixelSize - 1;
-            // curRay.direction[1] = 1 - (y + 0.5) * pixelSize;
-            // curRay.direction[2] = 1;
-
-            // color = trace(curRay,0);
             image.setColor(x, y, color[0], color[1], color[2]);
         }
 }
@@ -131,11 +134,6 @@ void Scene::setAmbientLightColor(Eigen::Vector3d light_color) {
 void Scene::setSpecularLightStrength(double strength) {
     if ((strength >=0) && (strength <= 1))
         specularLightStrength = strength;
-}
-
-void Scene::setShininess(double shine) {
-    if ((shine >=0) && (shine <= 1))
-        shininess = shine;
 }
 
 void Scene::setSpecularLightColor(Eigen::Vector3d light_color) {

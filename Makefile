@@ -6,7 +6,7 @@ LDFLAGS = -O3
 INCLUDE = -Iinclude/
 LIB = -lpng
 TARGET = hw4
-OBJS = objs/main.o objs/image.o objs/shape.o objs/sphere.o objs/scene.o
+OBJS = objs/main.o objs/image.o objs/shape.o objs/sphere.o objs/plane.o objs/scene.o
 
 default: $(OBJS)
 	$(LD) $(OBJS) $(LDFLAGS) $(LIB) -o $(TARGET)
@@ -25,6 +25,9 @@ objs/sphere.o: src/Sphere.cpp include/Sphere.h
 
 objs/scene.o: src/Scene.cpp include/Scene.h
 	$(CPP) -c $(CPPFLAGS) $(INCLUDE) src/Scene.cpp -o objs/scene.o
+
+objs/plane.o: src/Plane.cpp include/Plane.h
+	$(CPP) -c $(CPPFLAGS) $(INCLUDE) src/Plane.cpp -o objs/plane.o
 
 clean:
 	rm -f $(OBJS) hw4 test.png

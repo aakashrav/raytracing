@@ -29,7 +29,6 @@ public:
   void setAmbientLightStrength(double strength);
   void setAmbientLightColor(Eigen::Vector3d light_color);
   void setSpecularLightStrength(double strength);
-  void setShininess(double shine);
   void setSpecularLightColor(Eigen::Vector3d light_color);
 
 private:
@@ -37,7 +36,6 @@ private:
   Eigen::Vector3d lightPos;
   double ambientLightStrength;
   double specularLightStrength;
-  double shininess;
   Eigen::Vector3d ambientLightColor;
   Eigen::Vector3d specularLightColor;
   const int max_recursion_depth = 20;

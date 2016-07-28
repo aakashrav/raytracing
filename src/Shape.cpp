@@ -9,3 +9,8 @@ void Shape::setShapeColor(Vector3d color) {
         (color[2] >= 0) && (color[2] <=1) )
         shapeColor = color;
 }
+
+void Shape::setShininess(double shine) {
+    if ((shine >=0) && (shine <= 1))
+        shininess = shine;
+}
